@@ -40,7 +40,7 @@ class Plan extends Model
      *
      * @var string
      */
-    protected $primaryKey = 'plan_id';
+    protected $primaryKey = 'id';
 
     /**
      * Indicates if the IDs are auto-incrementing.

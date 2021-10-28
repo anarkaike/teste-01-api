@@ -2,31 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
-    public function getAllCustomers ()
+    public function getAllUsers ()
     {
-        // logic to get all students goes here
+        return response()->json([
+            'data' => User::all()
+        ], 201);
     }
 
-    public function createCustomer (Request $request) {
-        // logic to create a student record goes here
+    public function createUser (Request $request) {
+        $user = new User;
+        $user->name     = $request->name;
+        $user->email    = $request->email;
+        $user->password = $request->password;
+        $saved = $user->save();
+
+        return response()->json([
+            'id' => $user->id,
+            'message' => $saved ? 'User record created.' : 'Error creating record.',
+            'data' => $user->toArray()
+        ], 201);
     }
 
-    public function getCustomer ($id)
+    public function getUser ($id)
     {
-        // logic to get a student record goes here
+        $response = ['data' => $user = User::find($id)];
+        if (!$user) $response['message'] = 'Resource not found.';
+        return response()->json($response, 201);
     }
 
-    public function updateCustomer (Request $request, $id)
+    public function updateUser (Request $request, $id)
     {
-        // logic to update a student record goes here
+        $user = User::find($id);
+        $user->name     = $request->name;
+        $user->email    = $request->email;
+        $user->password = $request->password;
+
+        return response()->json([
+            'message' => $user->save() ? 'User record updated.' : 'Error updating record.',
+            'data' => $user->toArray()
+        ], 201);
     }
 
-    public function deleteCustomer ($id)
+    public function deleteUser ($id)
     {
-        // logic to delete a student record goes here
+        $user = User::find($id);
+        if (!$user) {
+            $message = 'Record already deleted.';
+        } else {
+            $message = $user->delete() ? 'User record deleted.' : 'Error deleting record.';
+        }
+        return response()->json([
+            'message' => $message
+        ], 201);
     }
 }

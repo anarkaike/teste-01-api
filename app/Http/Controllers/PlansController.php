@@ -2,31 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Plan;
 use Illuminate\Http\Request;
 
 class PlansController extends Controller
 {
-    public function getAllCustomers ()
+    public function getAllPlans ()
     {
-        // logic to get all students goes here
+        return response()->json([
+            'data' => Plan::all()
+        ], 201);
     }
 
-    public function createCustomer (Request $request) {
-        // logic to create a student record goes here
+    public function createPlan (Request $request) {
+        $plan = new Plan;
+        $plan->name     = $request->name;
+        $plan->price    = $request->price;
+        $saved = $plan->save();
+
+        return response()->json([
+            'id' => $plan->id,
+            'message' => $saved ? 'Plan record created.' : 'Error creating record.',
+            'data' => $plan->toArray()
+        ], 201);
     }
 
-    public function getCustomer ($id)
+    public function getPlan ($id)
     {
-        // logic to get a student record goes here
+        $response = ['data' => $plan = Plan::find($id)];
+        if (!$plan) $response['message'] = 'Resource not found.';
+        return response()->json($response, 201);
     }
 
-    public function updateCustomer (Request $request, $id)
+    public function updatePlan (Request $request, $id)
     {
-        // logic to update a student record goes here
+        $plan = Plan::find($id);
+        $plan->name     = $request->name;
+        $plan->price    = $request->price;
+
+        return response()->json([
+            'message' => $plan->save() ? 'Plan record updated.' : 'Error updating record.',
+            'data' => $plan->toArray()
+        ], 201);
     }
 
-    public function deleteCustomer ($id)
+    public function deletePlan ($id)
     {
-        // logic to delete a student record goes here
+        $plan = Plan::find($id);
+        if (!$plan) {
+            $message = 'Record already deleted.';
+        } else {
+            $message = $plan->delete() ? 'Plan record deleted.' : 'Error deleting record.';
+        }
+        return response()->json([
+            'message' => $message
+        ], 201);
     }
 }

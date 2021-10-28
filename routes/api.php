@@ -19,12 +19,7 @@ Route::middleware('auth:sanctum')
         return $request->user();
     });
 
-Route::get('testes', function () {
-    return response()->json([
-        "message" => "Customer record created."
-    ], 201);
-});
-
+Route::get('users', 'App\Http\Controllers\UsersController@getAllUsers');
 Route::get('users/{id}', 'App\Http\Controllers\UsersController@getUser');
 Route::post('users', 'App\Http\Controllers\UsersController@createUser');
 Route::put('users/{id}', 'App\Http\Controllers\UsersController@updateUser');
