@@ -28,7 +28,7 @@ class RegisterController extends Controller
                 'email' => $request->email,
                 'password' => bcrypt($request->password)
             ]);
-            $token = $user->createToken('Personal Access Token')->accessToken;
+            $token = $user->createToken('LaravelAuthApp')->accessToken;
 
             return $this->sendResponse(['id' => $user->id, 'token' => $token], 'User register successfully.');
         } else {
@@ -44,7 +44,7 @@ class RegisterController extends Controller
     public function login(Request $request)
     {
         if (auth()->attempt(['email' => $request->email, 'password' => $request->password])) {
-            $token = auth()->user()->createToken('Personal Access Token')->accessToken;
+            $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
             return $this->sendResponse(['token' => $token], 'User login successfully.');
         } else {
             return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
