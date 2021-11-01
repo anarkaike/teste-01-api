@@ -7,11 +7,16 @@ use Illuminate\Http\Request;
 
 class PlansController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function getAllPlans ()
     {
-        return response()->json([
+        return $this->sendResponse([
             'data' => Plan::all()
-        ], 201);
+        ]);
     }
 
     public function createPlan (Request $request) {
@@ -20,18 +25,16 @@ class PlansController extends Controller
         $plan->price    = $request->price;
         $saved = $plan->save();
 
-        return response()->json([
+        return $this->sendResponse([
             'id' => $plan->id,
-            'message' => $saved ? 'Plan record created.' : 'Error creating record.',
             'data' => $plan->toArray()
-        ], 201);
+        ], $saved ? 'Plan record created.' : 'Error creating record.');
     }
 
     public function getPlan ($id)
     {
         $response = ['data' => $plan = Plan::find($id)];
-        if (!$plan) $response['message'] = 'Resource not found.';
-        return response()->json($response, 201);
+        return $this->sendResponse($response, !$plan ? 'Resource not found.' : '');
     }
 
     public function updatePlan (Request $request, $id)
@@ -39,11 +42,11 @@ class PlansController extends Controller
         $plan = Plan::find($id);
         $plan->name     = $request->name;
         $plan->price    = $request->price;
+        $saved = $plan->save();
 
-        return response()->json([
-            'message' => $plan->save() ? 'Plan record updated.' : 'Error updating record.',
+        return $this->sendResponse([
             'data' => $plan->toArray()
-        ], 201);
+        ], $saved ? 'Plan record updated.' : 'Error updating record.');
     }
 
     public function deletePlan ($id)
@@ -54,8 +57,6 @@ class PlansController extends Controller
         } else {
             $message = $plan->delete() ? 'Plan record deleted.' : 'Error deleting record.';
         }
-        return response()->json([
-            'message' => $message
-        ], 201);
+        return $this->sendResponse(null, $message);
     }
 }

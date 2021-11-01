@@ -7,11 +7,16 @@ use Illuminate\Http\Request;
 
 class CustomersController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function getAllCustomers ()
     {
-        return response()->json([
+        return $this->sendResponse([
             'data' => Customer::all()
-        ], 201);
+        ]);
     }
 
     public function createCustomer (Request $request) {
@@ -24,18 +29,19 @@ class CustomersController extends Controller
         $customer->birthday = $request->birthday;
         $saved = $customer->save();
 
-        return response()->json([
+        return $this->sendResponse([
             'id' => $customer->id,
-            'message' => $saved ? 'Customer resource created.' : 'Error creating resource.',
             'data' => $customer->toArray()
-        ], 201);
+        ], $saved ? 'Customer resource created.' : 'Error creating resource.');
     }
 
     public function getCustomer ($id)
     {
-        $response = ['data' => $customer = Customer::find($id)];
-        if (!$customer) $response['message'] = 'Resource not found.';
-        return response()->json($response, 201);
+        $customer = Customer::find($id);
+        return $this->sendResponse(
+            ['data' => $customer],
+            !$customer ? 'Resource not found.' : 'Found resource.'
+        );
     }
 
     public function updateCustomer (Request $request, $id)
@@ -47,11 +53,11 @@ class CustomersController extends Controller
         $customer->state    = $request->state;
         $customer->city     = $request->city;
         $customer->birthday = $request->birthday;
+        $saved = $customer->save();
 
-        return response()->json([
-            'message' => $customer->save() ? 'Customer resource updated.' : 'Error updating resource.',
+        return $this->sendResponse([
             'data' => $customer->toArray()
-        ], 201);
+        ], $saved ? 'Customer resource updated.' : 'Error updating resource.');
     }
 
     public function deleteCustomer ($id)
@@ -62,8 +68,7 @@ class CustomersController extends Controller
         } else {
             $message = $customer->delete() ? 'Customer resource deleted.' : 'Error deleting resource.';
         }
-        return response()->json([
-            'message' => $message
-        ], 201);
+
+        return $this->sendResponse(null, $message);
     }
 }

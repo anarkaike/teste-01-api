@@ -14,27 +14,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')
-    ->get('/user', function (Request $request) {
-        return $request->user();
-    });
+Route::post('register', 'App\Http\Controllers\RegisterController@register');
+Route::post('login', 'App\Http\Controllers\RegisterController@login');
+Route::get('unauthorised', 'App\Http\Controllers\RegisterController@unauthorised')->name('unauthorised');
 
-Route::get('users', 'App\Http\Controllers\UsersController@getAllUsers');
-Route::get('users/{id}', 'App\Http\Controllers\UsersController@getUser');
-Route::post('users', 'App\Http\Controllers\UsersController@createUser');
-Route::put('users/{id}', 'App\Http\Controllers\UsersController@updateUser');
-Route::delete('users/{id}','App\Http\Controllers\UsersController@deleteUser');
+Route::middleware('auth:api')->group( function () {
+    Route::get('users', 'App\Http\Controllers\UsersController@getAllUsers');
+    Route::get('users/{id}', 'App\Http\Controllers\UsersController@getUser');
+    Route::post('users', 'App\Http\Controllers\UsersController@createUser');
+    Route::put('users/{id}', 'App\Http\Controllers\UsersController@updateUser');
+    Route::delete('users/{id}','App\Http\Controllers\UsersController@deleteUser');
 
-Route::get('customers', 'App\Http\Controllers\CustomersController@getAllCustomers');
-Route::get('customers/{id}', 'App\Http\Controllers\CustomersController@getCustomer');
-Route::post('customers', 'App\Http\Controllers\CustomersController@createCustomer');
-Route::put('customers/{id}', 'App\Http\Controllers\CustomersController@updateCustomer');
-Route::delete('customers/{id}','App\Http\Controllers\CustomersController@deleteCustomer');
+    Route::get('customers', 'App\Http\Controllers\CustomersController@getAllCustomers');
+    Route::get('customers/{id}', 'App\Http\Controllers\CustomersController@getCustomer');
+    Route::post('customers', 'App\Http\Controllers\CustomersController@createCustomer');
+    Route::put('customers/{id}', 'App\Http\Controllers\CustomersController@updateCustomer');
+    Route::delete('customers/{id}','App\Http\Controllers\CustomersController@deleteCustomer');
 
-Route::get('plans', 'App\Http\Controllers\PlansController@getAllPlans');
-Route::get('plans/{id}', 'App\Http\Controllers\PlansController@getPlan');
-Route::post('plans', 'App\Http\Controllers\PlansController@createPlan');
-Route::put('plans/{id}', 'App\Http\Controllers\PlansController@updatePlan');
-Route::delete('plans/{id}','App\Http\Controllers\PlansController@deletePlan');
-
-//Route::options('customers','ApiController@optionsCustomer');
+    Route::get('plans', 'App\Http\Controllers\PlansController@getAllPlans');
+    Route::get('plans/{id}', 'App\Http\Controllers\PlansController@getPlan');
+    Route::post('plans', 'App\Http\Controllers\PlansController@createPlan');
+    Route::put('plans/{id}', 'App\Http\Controllers\PlansController@updatePlan');
+    Route::delete('plans/{id}','App\Http\Controllers\PlansController@deletePlan');
+});
