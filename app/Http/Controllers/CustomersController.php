@@ -14,9 +14,7 @@ class CustomersController extends Controller
 
     public function getAllCustomers ()
     {
-        return $this->sendResponse([
-            'data' => Customer::all()
-        ]);
+        return $this->sendResponse(Customer::all());
     }
 
     public function createCustomer (Request $request) {
@@ -29,17 +27,26 @@ class CustomersController extends Controller
         $customer->birthday = $request->birthday;
         $saved = $customer->save();
 
-        return $this->sendResponse([
-            'id' => $customer->id,
-            'data' => $customer->toArray()
-        ], $saved ? 'Customer resource created.' : 'Error creating resource.');
+        if (is_array($request->plans)) {
+            $customer->customersPlans()->sync($request->plans);
+            $customer->save();
+        }
+
+        return $this->sendResponse($customer->toArray(), $saved ? 'Customer resource created.' : 'Error creating resource.');
     }
 
     public function getCustomer ($id)
     {
         $customer = Customer::find($id);
+        $plans = $customer->plans()->get();
+
+        $customer = $customer->toArray();
+        foreach ($plans as $plan) {
+            $customer['plans'][$plan->id] = $plan;
+        }
+
         return $this->sendResponse(
-            ['data' => $customer],
+            $customer,
             !$customer ? 'Resource not found.' : 'Found resource.'
         );
     }
@@ -55,20 +62,28 @@ class CustomersController extends Controller
         $customer->birthday = $request->birthday;
         $saved = $customer->save();
 
-        return $this->sendResponse([
-            'data' => $customer->toArray()
-        ], $saved ? 'Customer resource updated.' : 'Error updating resource.');
+        if (is_array($request->plans)) {
+            $customer->customersPlans()->sync($request->plans);
+            $customer->save();
+        }
+
+        $result = $customer->toArray();
+        $result['plans'] = $customer->plans()->get();
+
+        return $this->sendResponse($result, $saved ? 'Customer resource updated.' : 'Error updating resource.');
     }
 
     public function deleteCustomer ($id)
     {
         $customer = Customer::find($id);
-        if (!$customer) {
-            $message = 'Record already deleted.';
+        if ('sp' == $customer->state) {
+            return $this->sendError('This customer cannot be deleted. Customers from "sp" cannot be excluded.');
+        } elseif (!0 == $customer->plans()->where('plans.id', 1)->has('customersPlans', '>', 0)->count()) {
+            return $this->sendError('This customer cannot be deleted. "Free" plan customers cannot be excluded.');
+        } elseif (!$customer) {
+            return $this->sendError( 'Record already deleted.');
         } else {
-            $message = $customer->delete() ? 'Customer resource deleted.' : 'Error deleting resource.';
+            return $this->sendResponse(null, $customer->delete() ? 'Customer resource deleted.' : 'Error deleting resource.');
         }
-
-        return $this->sendResponse(null, $message);
     }
 }

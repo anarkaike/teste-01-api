@@ -14,9 +14,7 @@ class PlansController extends Controller
 
     public function getAllPlans ()
     {
-        return $this->sendResponse([
-            'data' => Plan::all()
-        ]);
+        return $this->sendResponse(Plan::all());
     }
 
     public function createPlan (Request $request) {
@@ -33,8 +31,7 @@ class PlansController extends Controller
 
     public function getPlan ($id)
     {
-        $response = ['data' => $plan = Plan::find($id)];
-        return $this->sendResponse($response, !$plan ? 'Resource not found.' : '');
+        return $this->sendResponse($plan = Plan::find($id), !$plan ? 'Resource not found.' : '');
     }
 
     public function updatePlan (Request $request, $id)

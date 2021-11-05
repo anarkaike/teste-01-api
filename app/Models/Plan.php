@@ -51,6 +51,10 @@ class Plan extends Model
 
     use HasFactory;
 
+    public function customersPlans(){
+        return $this->belongsToMany('App\Models\Customer', 'customers_plans_rel')->withPivot('id');;
+    }
+
     public function customers()
     {
         return $this->belongsToMany(

@@ -16,15 +16,13 @@ class UsersController extends Controller
 
     public function getAllUsers ()
     {
-        return $this->sendResponse([
-            'data' => User::all()
-        ]);
+        return $this->sendResponse(User::all());
     }
 
     public function getUser ($id)
     {
-        $response = ['data' => $user = User::find($id)];
-        return $this->sendResponse($response, !$user ? 'Resource not found.' : '');
+        $user = User::find($id);
+        return $this->sendResponse($user, !$user ? 'Resource not found.' : '');
     }
 
     public function updateUser (Request $request, $id)

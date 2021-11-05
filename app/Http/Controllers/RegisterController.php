@@ -45,7 +45,8 @@ class RegisterController extends Controller
     {
         if (auth()->attempt(['email' => $request->email, 'password' => $request->password])) {
             $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
-            return $this->sendResponse(['token' => $token], 'User login successfully.');
+            auth()->user()->token = $token;
+            return $this->sendResponse([ 'user' => auth()->user() ], 'User login successfully.');
         } else {
             return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
         }
